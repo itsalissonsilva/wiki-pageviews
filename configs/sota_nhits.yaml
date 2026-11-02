@@ -1,0 +1,32 @@
+experiment:
+  name: wiki-pageviews-nhits
+  seed: 42
+  tags:
+    stage: sota
+
+tracking:
+  uri: sqlite:///mlflow.db
+
+data:
+  path: data/processed/train.parquet
+  max_series: 5000
+  fill_method: zero
+
+validation:
+  horizon: 60
+  n_folds: 2
+  step: 60
+  min_train_days: 365
+
+model:
+  name: nhits
+  input_size: 240
+  max_steps: 1000
+  learning_rate: 0.001
+  batch_size: 64
+  windows_batch_size: 1024
+  scaler_type: robust
+
+output:
+  directory: artifacts/nhits
+
