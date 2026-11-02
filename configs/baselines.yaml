@@ -1,0 +1,46 @@
+experiment:
+  name: wiki-pageviews-baselines
+  seed: 42
+  tags:
+    stage: baselines
+
+tracking:
+  uri: sqlite:///mlflow.db
+
+data:
+  path: data/processed/train.parquet
+  max_series: null
+  fill_method: zero
+
+validation:
+  horizon: 60
+  n_folds: 3
+  step: 60
+  min_train_days: 365
+
+models:
+  baselines:
+    - name: last_value
+    - name: median
+    - name: rolling_median
+      window: 28
+    - name: seasonal_naive
+      period: 7
+    - name: seasonal_naive
+      period: 28
+    - name: seasonal_naive
+      period: 364
+  global_model:
+    enabled: false
+
+features:
+  lags: [1, 7, 14, 28, 56, 364]
+  rolling_windows: [7, 28, 56]
+
+tuning:
+  n_trials: 30
+  timeout_seconds: 7200
+
+output:
+  directory: artifacts/baselines
+

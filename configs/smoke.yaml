@@ -1,0 +1,55 @@
+experiment:
+  name: wiki-pageviews-smoke
+  seed: 42
+  tags:
+    stage: smoke
+
+tracking:
+  uri: sqlite:///mlflow.db
+
+data:
+  path: data/processed/synthetic.parquet
+  max_series: null
+  fill_method: zero
+
+validation:
+  horizon: 14
+  n_folds: 2
+  step: 14
+  min_train_days: 70
+
+models:
+  baselines:
+    - name: last_value
+    - name: median
+    - name: rolling_median
+      window: 28
+    - name: seasonal_naive
+      period: 7
+  global_model:
+    enabled: true
+    estimator: hist_gradient_boosting
+    params:
+      learning_rate: 0.08
+      max_iter: 80
+      max_leaf_nodes: 31
+      l2_regularization: 1.0
+      min_samples_leaf: 20
+
+features:
+  lags: [1, 7, 14, 28]
+  rolling_windows: [7, 14, 28]
+
+tuning:
+  n_trials: 5
+  timeout_seconds: 180
+  search_space:
+    learning_rate: [0.03, 0.15]
+    max_iter: [50, 150]
+    max_leaf_nodes: [15, 63]
+    l2_regularization: [0.0001, 5.0]
+    min_samples_leaf: [10, 50]
+
+output:
+  directory: artifacts/smoke
+
